@@ -110,7 +110,7 @@ const getCourseById = async (req, res) => {
         .select('studentId enrolledAt progress');
       
       enrolledStudents = enrollments.map(enrollment => ({
-        studentEmail: enrollment.studentId.email,
+        studentEmail: enrollment.studentId ? enrollment.studentId.email : 'Deleted Student',
         enrolledAt: enrollment.enrolledAt,
         progress: enrollment.progress
       }));

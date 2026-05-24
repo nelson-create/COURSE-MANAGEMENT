@@ -71,19 +71,21 @@ const getMyEnrollments = async (req, res) => {
       .populate('courseId', 'title description category thumbnail')
       .sort({ enrolledAt: -1 });
 
-    const formattedEnrollments = enrollments.map(enrollment => ({
-      courseId: enrollment.courseId._id,
-      enrolledAt: enrollment.enrolledAt,
-      completedModules: enrollment.completedModules,
-      progress: enrollment.progress,
-      course: {
-        id: enrollment.courseId._id,
-        title: enrollment.courseId.title,
-        description: enrollment.courseId.description,
-        category: enrollment.courseId.category,
-        thumbnail: enrollment.courseId.thumbnail
-      }
-    }));
+    const formattedEnrollments = enrollments
+      .filter(enrollment => enrollment.courseId !== null)
+      .map(enrollment => ({
+        courseId: enrollment.courseId._id,
+        enrolledAt: enrollment.enrolledAt,
+        completedModules: enrollment.completedModules,
+        progress: enrollment.progress,
+        course: {
+          id: enrollment.courseId._id,
+          title: enrollment.courseId.title,
+          description: enrollment.courseId.description,
+          category: enrollment.courseId.category,
+          thumbnail: enrollment.courseId.thumbnail
+        }
+      }));
 
     res.json({
       success: true,

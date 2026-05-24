@@ -30,7 +30,7 @@ const AdminDashboard = () => {
       if (response.success) {
         // Filter courses created by current admin
         const adminCourses = response.courses.filter(
-          course => course.createdBy.id === user.id || course.createdBy._id === user.id
+          course => course.createdBy && (course.createdBy.id === user.id || course.createdBy._id === user.id)
         );
         setCourses(adminCourses);
       }

@@ -5,6 +5,7 @@ import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import CreateCourse from './pages/CreateCourse';
 import EditCourse from './pages/EditCourse';
@@ -24,6 +25,7 @@ function App() {
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
               
               {/* Public Course Catalog */}
               <Route path="/courses" element={<CourseCatalog />} />
