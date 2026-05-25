@@ -18,20 +18,49 @@ connectDB();
 
 const app = express();
 
-// Middleware
+/* =========================
+   DEBUG LOGS (IMPORTANT)
+========================= */
+console.log("SERVER STARTED");
+console.log("ENV:", process.env.NODE_ENV);
+
+/* =========================
+   MIDDLEWARE
+========================= */
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true
 }));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+/* =========================
+   TEST ROUTE (VERY IMPORTANT)
+========================= */
+app.get('/test', (req, res) => {
+  res.json({ message: "SERVER WORKING PERFECTLY" });
+});
+
+/* =========================
+   ROUTE DEBUG LOGS
+========================= */
+console.log("AUTH ROUTE LOADED");
+console.log("COURSES ROUTE LOADED");
+console.log("ENROLLMENTS ROUTE LOADED");
+
+
+
+/* =========================
+   ROUTES
+========================= */
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/courses', require('./routes/courses'));
 app.use('/api/enrollments', require('./routes/enrollments'));
 
-// Health check endpoint
+/* =========================
+   HEALTH CHECK
+========================= */
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
@@ -40,17 +69,23 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Error handling middleware
+/* =========================
+   ERROR HANDLING
+========================= */
 app.use((err, req, res, next) => {
   console.error('Error:', err.stack);
   res.status(500).json({
     success: false,
     message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+    error: process.env.NODE_ENV === 'development'
+      ? err.message
+      : 'Internal server error'
   });
 });
 
-// 404 handler
+/* =========================
+   404 HANDLER
+========================= */
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
@@ -58,8 +93,12 @@ app.use('*', (req, res) => {
   });
 });
 
+/* =========================
+   START SERVER
+========================= */
 if (require.main === module) {
   const PORT = process.env.PORT || 5000;
+
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
