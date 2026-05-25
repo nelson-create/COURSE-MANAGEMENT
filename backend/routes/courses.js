@@ -32,7 +32,9 @@ const courseValidation = [
 
 // Routes
 router.post('/', verifyToken, roleCheck('admin'), courseValidation, createCourse);
-router.get('/', getAllCourses);
+router.get('/', (req, res) => {
+  res.json({ message: "COURSES ROUTE WORKING" });
+});
 router.get('/:courseId', optionalToken, getCourseById);
 router.put('/:courseId', verifyToken, roleCheck('admin'), courseValidation, updateCourse);
 router.delete('/:courseId', verifyToken, roleCheck('admin'), deleteCourse);
