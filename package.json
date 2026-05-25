@@ -2,7 +2,6 @@
   "name": "course-management-platform",
   "version": "1.0.0",
   "description": "Full-stack course management platform with role-based access",
-  "main": "server.js",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd backend && npm run dev",
@@ -20,14 +19,5 @@
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"
-  },
-  "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^7.5.0",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express-validator": "^7.0.1"
   }
 }

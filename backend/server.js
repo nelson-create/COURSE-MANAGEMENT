@@ -8,21 +8,13 @@ try {
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 const connectDB = require('./config/database');
 
 // Load environment variables
 dotenv.config();
 
-// Connect to database
-connectDB();
-
 const app = express();
-
-/* =========================
-   DEBUG LOGS (IMPORTANT)
-========================= */
-console.log("SERVER STARTED");
-console.log("ENV:", process.env.NODE_ENV);
 
 /* =========================
    MIDDLEWARE
@@ -36,27 +28,55 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 /* =========================
-   TEST ROUTE (VERY IMPORTANT)
+   DATABASE CONNECTION
+========================= */
+let dbConnectionPromise = null;
+
+const ensureDBConnection = async () => {
+  if (mongoose.connection.readyState === 1) {
+    return;
+  }
+  
+  if (!dbConnectionPromise) {
+    dbConnectionPromise = connectDB().catch(err => {
+      dbConnectionPromise = null;
+      throw err;
+    });
+  }
+  
+  return dbConnectionPromise;
+};
+
+/* =========================
+   DB MIDDLEWARE FOR API ROUTES
+========================= */
+const dbMiddleware = async (req, res, next) => {
+  try {
+    await ensureDBConnection();
+    next();
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Database connection failed',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+/* =========================
+   TEST ROUTE
 ========================= */
 app.get('/test', (req, res) => {
   res.json({ message: "SERVER WORKING PERFECTLY" });
 });
 
 /* =========================
-   ROUTE DEBUG LOGS
-========================= */
-console.log("AUTH ROUTE LOADED");
-console.log("COURSES ROUTE LOADED");
-console.log("ENROLLMENTS ROUTE LOADED");
-
-
-
-/* =========================
    ROUTES
 ========================= */
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/courses', require('./routes/courses'));
-app.use('/api/enrollments', require('./routes/enrollments'));
+app.use('/api/auth', dbMiddleware, require('./routes/auth'));
+app.use('/api/courses', dbMiddleware, require('./routes/courses'));
+app.use('/api/enrollments', dbMiddleware, require('./routes/enrollments'));
 
 /* =========================
    HEALTH CHECK
@@ -65,7 +85,8 @@ app.get('/api/health', (req, res) => {
   res.json({
     success: true,
     message: 'Course Management API is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    dbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
 
@@ -98,10 +119,14 @@ app.use('*', (req, res) => {
 ========================= */
 if (require.main === module) {
   const PORT = process.env.PORT || 5000;
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  ensureDBConnection().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    });
+  }).catch(err => {
+    console.error('Server failed to start:', err);
+    process.exit(1);
   });
 }
 
