@@ -19,7 +19,12 @@ function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <Router>
+        <Router
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
           <div className="min-h-screen bg-gray-50">
             <Navbar />
             <Routes>

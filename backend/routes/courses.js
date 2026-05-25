@@ -7,7 +7,7 @@ const {
   updateCourse,
   deleteCourse
 } = require('../controllers/courseController');
-const { verifyToken, roleCheck } = require('../middleware/auth');
+const { verifyToken, optionalToken, roleCheck } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -25,7 +25,7 @@ const courseValidation = [
     .isIn(['Web Development', 'Mobile Development', 'Data Science', 'Design', 'Other'])
     .withMessage('Category must be one of: Web Development, Mobile Development, Data Science, Design, Other'),
   body('thumbnail')
-    .optional()
+    .optional({ values: 'falsy' })
     .isURL()
     .withMessage('Thumbnail must be a valid URL')
 ];
@@ -33,7 +33,7 @@ const courseValidation = [
 // Routes
 router.post('/', verifyToken, roleCheck('admin'), courseValidation, createCourse);
 router.get('/', getAllCourses);
-router.get('/:courseId', getCourseById);
+router.get('/:courseId', optionalToken, getCourseById);
 router.put('/:courseId', verifyToken, roleCheck('admin'), courseValidation, updateCourse);
 router.delete('/:courseId', verifyToken, roleCheck('admin'), deleteCourse);
 

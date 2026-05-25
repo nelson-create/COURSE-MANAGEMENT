@@ -1,3 +1,10 @@
+try {
+  const dns = require('dns');
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (err) {
+  console.warn('Warning: Could not set custom DNS servers:', err.message);
+}
+
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const User = require('../models/User');
@@ -18,21 +25,36 @@ const seedData = async () => {
     await Enrollment.deleteMany({});
     console.log('Cleared existing data');
 
-    // Create admin user (model handles password hashing)
+    // Create admin users (model handles password hashing)
     const admin = await User.create({
       email: 'admin@gisul.com',
       password: 'Admin@123',
       role: 'admin'
     });
-    console.log('Created admin user:', admin.email);
+    const admin2 = await User.create({
+      email: 'admin@courseplatform.com',
+      password: 'admin123',
+      role: 'admin'
+    });
+    console.log('Created admin users');
 
-    // Create student user (model handles password hashing)
+    // Create student users (model handles password hashing)
     const student = await User.create({
       email: 'student@gisul.com',
       password: 'Student@123',
       role: 'student'
     });
-    console.log('Created student user:', student.email);
+    const student2 = await User.create({
+      email: 'john@student.com',
+      password: 'student123',
+      role: 'student'
+    });
+    const student3 = await User.create({
+      email: 'jane@student.com',
+      password: 'student123',
+      role: 'student'
+    });
+    console.log('Created student users');
 
     // Create sample courses
     const courses = await Course.insertMany([
@@ -70,8 +92,11 @@ const seedData = async () => {
     console.log('Created sample enrollment');
 
     console.log('\n=== SEED DATA COMPLETE ===');
-    console.log('Admin Login: admin@gisul.com / Admin@123');
-    console.log('Student Login: student@gisul.com / Student@123');
+    console.log('Admin Login 1: admin@gisul.com / Admin@123');
+    console.log('Admin Login 2: admin@courseplatform.com / admin123');
+    console.log('Student Login 1: student@gisul.com / Student@123');
+    console.log('Student Login 2: john@student.com / student123');
+    console.log('Student Login 3: jane@student.com / student123');
     console.log('================================\n');
 
     process.exit(0);

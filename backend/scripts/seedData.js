@@ -1,3 +1,10 @@
+try {
+  const dns = require('dns');
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (err) {
+  console.warn('Warning: Could not set custom DNS servers:', err.message);
+}
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
@@ -19,13 +26,18 @@ const seedData = async () => {
     await Enrollment.deleteMany({});
     console.log('Cleared existing data');
 
-    // Create admin user (let the model handle password hashing)
+    // Create admin users (let the model handle password hashing)
     const admin = await User.create({
       email: 'admin@courseplatform.com',
       password: 'admin123',
       role: 'admin'
     });
-    console.log('Created admin user:', admin.email);
+    const admin2 = await User.create({
+      email: 'admin@gisul.com',
+      password: 'Admin@123',
+      role: 'admin'
+    });
+    console.log('Created admin users');
 
     // Create student users (let the model handle password hashing)
     const student1 = await User.create({
@@ -37,6 +49,12 @@ const seedData = async () => {
     const student2 = await User.create({
       email: 'jane@student.com',
       password: 'student123',
+      role: 'student'
+    });
+
+    const student3 = await User.create({
+      email: 'student@gisul.com',
+      password: 'Student@123',
       role: 'student'
     });
     console.log('Created student users');
@@ -111,9 +129,11 @@ const seedData = async () => {
     console.log('Created sample enrollments');
 
     console.log('\n=== SEED DATA COMPLETE ===');
-    console.log('Admin Login: admin@courseplatform.com / admin123');
+    console.log('Admin Login 1: admin@courseplatform.com / admin123');
+    console.log('Admin Login 2: admin@gisul.com / Admin@123');
     console.log('Student Login 1: john@student.com / student123');
     console.log('Student Login 2: jane@student.com / student123');
+    console.log('Student Login 3: student@gisul.com / Student@123');
     console.log('================================\n');
 
     process.exit(0);

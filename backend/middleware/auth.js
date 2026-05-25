@@ -35,6 +35,26 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
+// Optionally verify JWT token (does not fail if no token or invalid token)
+const optionalToken = async (req, res, next) => {
+  try {
+    const authHeader = req.header('Authorization');
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id).select('-password');
+      if (user) {
+        req.user = user;
+      }
+    }
+    next();
+  } catch (error) {
+    // Fail silently and proceed without req.user
+    next();
+  }
+};
+
 // Check user role
 const roleCheck = (requiredRole) => {
   return (req, res, next) => {
@@ -56,4 +76,4 @@ const roleCheck = (requiredRole) => {
   };
 };
 
-module.exports = { verifyToken, roleCheck };
+module.exports = { verifyToken, optionalToken, roleCheck };
