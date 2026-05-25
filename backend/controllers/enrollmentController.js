@@ -72,7 +72,7 @@ const getMyEnrollments = async (req, res) => {
       .sort({ enrolledAt: -1 });
 
     const formattedEnrollments = enrollments
-      .filter(enrollment => enrollment.courseId !== null)
+      .filter(enrollment => enrollment.courseId)
       .map(enrollment => ({
         courseId: enrollment.courseId._id,
         enrolledAt: enrollment.enrolledAt,
